@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Co-Reader</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<div class="brand">
+  <div class="brand-dot"></div><div class="brand-name">Co-Reader</div>
+  <button id="home-btn" class="home-btn hidden" title="Upload a different PDF">&#8592; New document</button>
+</div>
+
+<!-- Upload -->
+<div id="screen-upload">
+  <div class="dropzone">
+    <h1>Drop a PDF to start reading together</h1>
+    <p>Read, listen, and ask questions as you go.</p>
+    <input type="file" id="file-input" accept="application/pdf" class="hidden">
+    <button class="btn" id="choose-btn">Choose a file</button>
+  </div>
+</div>
+
+<!-- Processing (brief — just the landing overview, not the whole book) -->
+<div id="screen-processing" class="hidden">
+  <div class="proc-card">
+    <div class="spinner"></div>
+    <h2>Skimming the document&hellip;</h2>
+    <p>Your PDF is ready to read now. The optional overview is being prepared in the background.</p>
+    <button class="btn secondary" id="start-reading-early-btn" disabled>Start reading now</button>
+  </div>
+</div>
+
+<!-- Summary / landing -->
+<div id="screen-summary" class="hidden">
+  <div class="summary-card">
+    <h2>Here's what this document covers</h2>
+    <div class="body-text" id="summary-text">&hellip;</div>
+    <div class="terms-review hidden" id="terms-review">
+      <div class="terms-review-label">Characters found — want any read differently?</div>
+      <div id="terms-list"></div>
+    </div>
+    <div class="audio-row">
+      <button class="icon-btn" id="summary-play-btn">&#9658;</button>
+      <span id="summary-audio-label" style="font-size:13px;color:var(--ink-soft);">Play the overview</span>
+      <button class="btn" id="start-reading-btn" style="margin-left:auto;">Ready to start narration</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reading -->
+<div id="screen-reading" class="hidden">
+  <div class="book-col">
+    <div class="page-nav">
+      <button id="prev-btn">&#8249;</button>
+      <span class="page-indicator" id="page-indicator">page 1 / 1</span>
+      <button id="next-btn">&#8250;</button>
+    </div>
+    <div class="viewer-wrap">
+      <canvas id="pdf-canvas"></canvas>
+    </div>
+  </div>
+
+  <div class="side-col">
+    <div id="experience-status" class="experience-status hidden" role="status" aria-live="polite"></div>
+    <div class="narration-panel">
+      <div class="narration-head">
+        <h3 id="narration-title">Co-Reader</h3>
+        <select id="tone-select" title="Voice tone">
+          <option value="warm">Warm</option>
+          <option value="calm">Calm</option>
+          <option value="bright">Bright</option>
+          <option value="deep">Deep</option>
+          <option value="classic">Classic</option>
+        </select>
+      </div>
+      <div class="caption-box" id="caption-box">
+        <span class="caption-placeholder">Narration will appear here as it plays.</span>
+      </div>
+      <div class="sources-row hidden" id="sources-row"></div>
+      <div class="narrate-row">
+        <button class="narrate-btn" id="narrate-btn">&#9658; Narrate this page</button>
+        <button class="interrupt-btn hidden" id="interrupt-btn">Interrupt &amp; ask</button>
+      </div>
+    </div>
+
+    <div class="qa-panel">
+      <h3>Ask Co-Reader</h3>
+      <p class="hint">Type a question, or use the mic in Chrome or Edge. Voice input pauses narration as soon as you speak.</p>
+      <div class="qa-log" id="qa-log"></div>
+      <button class="reexplain-btn" id="reexplain-btn">&#8635; Re-explain this page, differently</button>
+      <form class="ask-form" id="ask-form">
+        <button type="button" class="mic-btn" id="mic-btn" title="Listen for questions">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </button>
+        <input class="ask-input" id="ask-input" placeholder="Ask about anything you've read…" autocomplete="off">
+        <button class="send-btn" type="submit">&#8594;</button>
+      </form>
+      <p class="hint" id="mic-hint"></p>
+    </div>
+  </div>
+</div>
+
+<audio id="audio-player"></audio>
+<audio id="qa-audio"></audio>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

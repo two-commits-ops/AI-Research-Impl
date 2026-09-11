@@ -1,0 +1,16 @@
+beautifulsoup4==4.15.0
+fastapi==0.141.1
+google-auth==2.57.1
+google-genai==2.22.0
+misaki==0.9.4
+mlx-audio==0.5.1
+mlx-metal==0.32.2
+mlx==0.32.2
+pydantic==2.13.5
+pydantic_core==2.46.5
+pymupdf==1.28.2
+pypdf==6.17.0
+python-multipart==0.0.32
+requests==2.34.2
+starlette==1.6.0
+uvicorn==0.52.4
