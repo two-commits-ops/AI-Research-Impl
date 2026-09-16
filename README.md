@@ -3,9 +3,7 @@
 ## Usage & License
 
 This repo is public so others can see and reference the work, but it isn't
-under an open-source license — all rights are reserved. If something here is
-useful to you and you'd like to reuse or build on it, reach out first rather
-than assuming it's free to copy.
+under an open-source license — all rights are reserved.
 
 ## Collaboration
 
