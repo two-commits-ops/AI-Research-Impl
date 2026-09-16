@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+help_design/compiled/*.json
+.env
+*.env
+.env.*
