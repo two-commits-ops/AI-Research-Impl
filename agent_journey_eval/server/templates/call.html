@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shopping Voice Agent</title>
+<link rel="stylesheet" href="/static/base.css?v={{ asset_version }}" />
+<link rel="stylesheet" href="/static/call.css?v={{ asset_version }}" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="dot" id="conn-dot"></span>
+        <span>Shopping Voice Agent</span>
+      </div>
+      <nav class="topnav">
+        <a href="/calls">Past calls</a>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <section class="call-panel">
+        <div class="transcript" id="transcript"></div>
+
+        <div class="controls">
+          <button id="mic-btn" class="mic-btn" title="Click to talk">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+              <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+            </svg>
+          </button>
+          <div class="mic-status" id="mic-status">Click the mic and start talking</div>
+          <form id="type-form" class="type-form">
+            <input id="type-input" type="text" placeholder="…or type what you'd say" autocomplete="off" />
+            <button type="submit">Send</button>
+          </form>
+          <button id="end-call-btn" class="end-call-btn">End call</button>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="panel-block">
+          <div class="path-header">
+            <h3 id="path-heading">Path so far</h3>
+            <button id="tree-toggle-btn" class="tree-toggle-btn" hidden>View full tree</button>
+          </div>
+          <p class="stepper-hint" id="stepper-hint">Nothing yet — steps appear here as the conversation actually reaches them.</p>
+          <ol class="stage-stepper" id="stage-stepper"></ol>
+          <div class="tree-view" id="tree-view" hidden></div>
+        </div>
+
+        <div class="panel-block metrics">
+          <h3>Live signal</h3>
+          <div class="metric">
+            <span class="metric-label">Satisfaction</span>
+            <div class="gauge"><div class="gauge-fill" id="sat-fill"></div></div>
+            <span class="metric-value" id="sat-value">–</span>
+          </div>
+          <div class="metric-row">
+            <div><span class="metric-label">Mood</span><div class="metric-value" id="mood-value">–</div></div>
+            <div><span class="metric-label">Drift count</span><div class="metric-value" id="drift-count-value">0</div></div>
+            <div><span class="metric-label">Last latency</span><div class="metric-value" id="latency-value">–</div></div>
+          </div>
+        </div>
+
+        <div class="panel-block drift-feed">
+          <h3>Deviations</h3>
+          <ul id="drift-list" class="drift-list"><li class="empty">None yet</li></ul>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>window.__FLOWS__ = {{ flows | tojson }};</script>
+  <script src="/static/call.js?v={{ asset_version }}"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+# Order-management flow — checking on, tracking, or cancelling an EXISTING
+# order. Account/order info is already known from the call (see prompts.py),
+# so there's no separate authentication node.
+name: order_management_v1
+display_name: Order Management
+entry_description: >
+  Applies when the caller wants to check on, track, or cancel an existing
+  order, rather than shop for something new.
+stages:
+  - id: order_intent
+    name: Order intent capture
+    description: Agent confirms which order the caller means, or that they want to look through recent orders.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller confirms they want to look at their orders
+        to: view_order_history
+
+  - id: view_order_history
+    name: View order history
+    description: Agent calls view_order_history to see the caller's recent orders.
+    expected_actor: agent
+    expected_tool: view_order_history
+    edges:
+      - condition: caller identifies which specific order they mean
+        to: check_order
+
+  - id: check_order
+    name: Check order
+    description: Agent calls check_order on the specific order to get its current status.
+    expected_actor: agent
+    expected_tool: check_order
+    edges:
+      - condition: caller asks when it will arrive
+        to: delivery_inquiry
+      - condition: caller wants to cancel the order
+        to: cancel_flow
+
+  - id: delivery_inquiry
+    name: Delivery inquiry
+    description: Agent calls get_delivery_time and shares the estimate.
+    expected_actor: agent
+    expected_tool: get_delivery_time
+    edges:
+      - condition: agent shares the estimate and wraps up
+        to: close
+
+  - id: cancel_flow
+    name: Cancel order
+    description: Agent calls cancel_order and confirms the cancellation.
+    expected_actor: agent
+    expected_tool: cancel_order
+    edges:
+      - condition: agent confirms the cancellation and wraps up
+        to: close
+
+  - id: close
+    name: Close
+    description: Agent confirms what happened and ends the call warmly.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller wants to check on another order in the same call
+        to: order_intent

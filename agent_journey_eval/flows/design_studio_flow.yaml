@@ -1,0 +1,78 @@
+# Design-studio flow — planning/furnishing a space, not buying one specific
+# known item. Shares the product_search tool with the purchase flow (a real
+# capability, not domain-specific), but the shape of the conversation around
+# it is different: dimensions/style first, a concept second, a save third.
+name: design_studio_v1
+display_name: Design Studio
+entry_description: >
+  Applies when the caller wants to plan or furnish a space (a room, an
+  outdoor area, etc.) rather than buy one specific item outright.
+stages:
+  - id: design_intent
+    name: Design intent capture
+    description: Agent asks what space the caller is designing.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller describes the space
+        to: capture_dimensions
+
+  - id: capture_dimensions
+    name: Capture dimensions & style
+    description: Agent asks for the space's dimensions and style preferences.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: agent has enough info and searches for fitting pieces
+        to: product_search
+
+  - id: product_search
+    name: Product search
+    description: Agent calls product_search for pieces that fit the space and style.
+    expected_actor: agent
+    expected_tool: product_search
+    edges:
+      - condition: search results come back and agent presents a concept
+        to: present_options
+
+  - id: present_options
+    name: Present concept
+    description: Agent presents a short concept built from the matched pieces.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller wants changes or to see other pieces
+        to: refine
+      - condition: caller is happy with the concept
+        to: finalize_design
+
+  - id: refine
+    name: Refine
+    description: Caller reacts to the concept; agent adjusts or searches again.
+    expected_actor: user
+    expected_tool: product_search
+    edges:
+      - condition: agent runs a new search based on feedback
+        to: product_search
+      - condition: agent adjusts the concept without a new search
+        to: present_options
+      - condition: caller is happy after refining
+        to: finalize_design
+
+  - id: finalize_design
+    name: Finalize design
+    description: Agent calls save_design to save the finalized concept.
+    expected_actor: agent
+    expected_tool: save_design
+    edges:
+      - condition: agent confirms it's saved and wraps up
+        to: close
+
+  - id: close
+    name: Close
+    description: Agent confirms the saved design and ends the call warmly.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller wants to design another space in the same call
+        to: design_intent

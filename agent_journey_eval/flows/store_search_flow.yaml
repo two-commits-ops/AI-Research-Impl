@@ -1,0 +1,48 @@
+# Store-search flow — finding a physical store location as the caller's
+# PRIMARY request (a peer journey to shopping/order-management/design, not a
+# branch inside one of them). Entry is free like any flow: if the caller
+# already gave a zip code up front, the agent can go straight to the tool
+# call node without a separate requirement-gathering turn.
+name: store_search_v1
+display_name: Store Search
+entry_description: >
+  Applies when the caller's main request is to find a nearby physical store
+  location — not a side question asked while doing something else.
+stages:
+  - id: requirement_gathering
+    name: Requirement gathering
+    description: Agent asks for the caller's zip code or area if not already given.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller gives a zip code or area
+        to: store_lookup
+
+  - id: store_lookup
+    name: Store lookup
+    description: Agent calls view_store_location with the caller's zip code.
+    expected_actor: agent
+    expected_tool: view_store_location
+    edges:
+      - condition: lookup completes (or fails) and agent responds
+        to: present_results
+
+  - id: present_results
+    name: Present results
+    description: Agent shares the store location, or explains the lookup failed and offers an alternative.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller wants to check a different zip code or area
+        to: requirement_gathering
+      - condition: caller is done
+        to: close
+
+  - id: close
+    name: Close
+    description: Agent wraps up the call warmly.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller wants to check another location in the same call
+        to: requirement_gathering

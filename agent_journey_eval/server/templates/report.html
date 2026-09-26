@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Call Trajectory</title>
+<link rel="stylesheet" href="/static/base.css?v={{ asset_version }}" />
+<link rel="stylesheet" href="/static/report.css?v={{ asset_version }}" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="dot live"></span><span>Call Trajectory</span></div>
+    <nav class="topnav"><a href="/">New call</a> &nbsp;·&nbsp; <a href="/calls">All calls</a></nav>
+  </header>
+
+  <main class="report" id="report">
+    <div class="loading">Loading call…</div>
+  </main>
+
+  <script>window.__CALL_ID__ = {{ call_id | tojson }};</script>
+  <script src="/static/report.js?v={{ asset_version }}"></script>
+</body>
+</html>

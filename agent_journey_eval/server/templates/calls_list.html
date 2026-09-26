@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Past Calls</title>
+<link rel="stylesheet" href="/static/base.css?v={{ asset_version }}" />
+<style>
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-dim); font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  tr:hover td { background: var(--panel-2); }
+  a.row-link { color: inherit; text-decoration: none; display: block; }
+  .badge { padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+  .badge.drift { background: rgba(239,91,91,0.15); color: var(--bad); }
+  .badge.ok { background: rgba(55,199,147,0.15); color: var(--good); }
+  .empty { padding: 60px; text-align: center; color: var(--text-dim); }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="dot live"></span><span>Past calls</span></div>
+    <nav class="topnav"><a href="/">New call</a></nav>
+  </header>
+  <div class="wrap">
+    <table id="calls-table">
+      <thead>
+        <tr><th>Started</th><th>Status</th><th>Turns</th><th>Deviations</th><th>Satisfaction</th><th>Your label</th></tr>
+      </thead>
+      <tbody id="calls-body"></tbody>
+    </table>
+    <div id="empty-state" class="empty" hidden>No calls yet — start one from the home page.</div>
+  </div>
+  <script>
+    fetch("/api/calls").then(r => r.json()).then(calls => {
+      const body = document.getElementById("calls-body");
+      if (!calls.length) { document.getElementById("empty-state").hidden = false; return; }
+      calls.forEach(c => {
+        const tr = document.createElement("tr");
+        const started = new Date(c.started_at * 1000).toLocaleString();
+        const sat = c.running_satisfaction != null ? Math.round(c.running_satisfaction * 100) + "%" : "–";
+        const label = c.user_label_score ? "★".repeat(c.user_label_score) : "–";
+        tr.innerHTML = `
+          <td><a class="row-link" href="/call/${c.id}">${started}</a></td>
+          <td>${c.status}</td>
+          <td>-</td>
+          <td>${c.drift_count ? `<span class="badge drift">${c.drift_count}</span>` : `<span class="badge ok">0</span>`}</td>
+          <td>${sat}</td>
+          <td>${label}</td>
+        `;
+        tr.style.cursor = "pointer";
+        tr.addEventListener("click", () => window.location.href = `/call/${c.id}`);
+        body.appendChild(tr);
+      });
+    });
+  </script>
+</body>
+</html>

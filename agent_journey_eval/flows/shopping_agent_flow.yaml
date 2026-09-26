@@ -1,0 +1,99 @@
+# Ideal path for the shopping voice agent — a graph, not a line. Drafted by
+# scripts/derive_flow.py from the agent's system prompt + tool schemas, then
+# hand-reviewed here. Edges are the actually-legitimate transitions; anything
+# a turn does that isn't the current node or one of its edges is "off-graph"
+# (handled by the judge as either a fine tangent or real drift — see judge.py).
+name: shopping_agent_v1
+display_name: Shopping
+entry_description: >
+  Applies whenever the caller is trying to find and buy one or more products
+  during the call (as opposed to e.g. pure small talk or an unrelated question).
+stages:
+  - id: greeting
+    name: Greeting & intent capture
+    description: Agent greets the caller and asks what they're shopping for.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller states what they're shopping for
+        to: needs_discovery
+
+  - id: needs_discovery
+    name: Needs discovery
+    description: Agent asks clarifying questions (budget, category, must-haves) before searching.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller gives partial info; agent still needs more before searching
+        to: needs_discovery
+      - condition: agent has enough info and searches
+        to: product_search
+
+  - id: product_search
+    name: Product search
+    description: Agent calls product_search with the gathered requirements.
+    expected_actor: agent
+    expected_tool: product_search
+    edges:
+      - condition: search results come back and agent summarizes them
+        to: present_options
+
+  - id: present_options
+    name: Present options
+    description: Agent summarizes search results as a short set of concrete options.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller reacts, wants changes, or asks to see other options
+        to: refine
+      - condition: caller picks one of the presented options directly
+        to: check_stock
+
+  - id: refine
+    name: Refine
+    description: Caller reacts to the options; agent narrows down or searches again if needed.
+    expected_actor: user
+    expected_tool: product_search
+    edges:
+      - condition: agent runs a new search based on the caller's feedback
+        to: product_search
+      - condition: agent narrows the existing results without a new search, or re-presents after a new search
+        to: present_options
+
+  - id: check_stock
+    name: Check stock
+    description: Agent calls check_inventory on the chosen product before adding it to the cart.
+    expected_actor: agent
+    expected_tool: check_inventory
+    edges:
+      - condition: in stock — agent adds it to the cart
+        to: add_to_cart
+      - condition: out of stock — agent goes back to other options
+        to: present_options
+
+  - id: add_to_cart
+    name: Selection
+    description: Agent adds the in-stock, chosen product to the cart.
+    expected_actor: agent
+    expected_tool: add_to_cart
+    edges:
+      - condition: agent moves on to shipping/cost details
+        to: checkout
+
+  - id: checkout
+    name: Checkout details
+    description: Agent gathers shipping preference and confirms cost/delivery window.
+    expected_actor: agent
+    expected_tool: checkout
+    edges:
+      - condition: agent confirms the order and wraps up
+        to: close
+
+  - id: close
+    name: Close
+    description: Agent confirms the order and ends the call warmly.
+    expected_actor: agent
+    expected_tool: null
+    edges:
+      - condition: caller wants to shop for another item in the same call
+        to: needs_discovery
