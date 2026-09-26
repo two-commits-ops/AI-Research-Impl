@@ -5,3 +5,6 @@ help_design/compiled/*.json
 .env
 *.env
 .env.*
+.DS_Store
+.claude/
+help_design.zip

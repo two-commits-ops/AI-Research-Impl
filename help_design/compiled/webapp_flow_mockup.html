@@ -1,0 +1,669 @@
+<title>Help Design — Web App Flow</title>
+<style>
+  :root {
+    --ground: #10140D;
+    --app-bg: #171C13;
+    --panel: #1E2517;
+    --panel-2: #262F1D;
+    --ink: #EDE8DC;
+    --ink-soft: #9FA89A;
+    --ink-faint: #66705F;
+    --accent: #7FCB86;
+    --accent-ink: #0C1409;
+    --accent-soft: rgba(127, 203, 134, 0.14);
+    --gold: #E3B368;
+    --gold-soft: rgba(227, 179, 104, 0.16);
+    --warn: #E0855C;
+    --line: rgba(237, 232, 220, 0.10);
+    --line-strong: rgba(237, 232, 220, 0.18);
+    --shadow: 0 40px 80px -32px rgba(0, 0, 0, 0.7);
+
+    --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, ui-serif, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 64px 32px 12px;
+  }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 4.6vw, 46px);
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  .masthead p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .masthead .session-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 8px 16px 8px 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .session-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .session-tag b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- reel ---------- */
+  .reel-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 32px 96px;
+    overflow-x: auto;
+  }
+  .reel { position: relative; }
+  .reel::before {
+    content: "";
+    position: absolute;
+    top: 8px; bottom: 46px; left: 3px;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, var(--line-strong) 0 6px, transparent 6px 11px);
+  }
+  .stage {
+    position: relative;
+    padding-left: 34px;
+    margin-bottom: 56px;
+  }
+  .stage:last-child { margin-bottom: 0; }
+  .stage::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 6px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--ground);
+  }
+  .stage-label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 14px;
+  }
+  .stage-label .tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .stage-label b {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ---------- browser window ---------- */
+  .window {
+    min-width: 620px;
+    max-width: 900px;
+    background: var(--app-bg);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  .chrome .dots { display: flex; gap: 6px; }
+  .chrome .dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
+  .chrome .addr {
+    flex: 1;
+    max-width: 320px;
+    background: var(--app-bg);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--ink-faint);
+  }
+
+  .app-shell { display: flex; height: 420px; }
+
+  .app-main { display: flex; flex: 1; min-height: 0; }
+
+  .rail {
+    width: 178px;
+    flex: none;
+    border-right: 1px solid var(--line);
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .rail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .rail-item .mark {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1.4px solid var(--line-strong);
+    flex: none; position: relative;
+  }
+  .rail-item.done .mark { background: var(--accent); border-color: var(--accent); }
+  .rail-item.done .mark::after {
+    content: ""; position: absolute; left: 4px; top: 2px;
+    width: 3px; height: 6px;
+    border-right: 1.4px solid var(--accent-ink);
+    border-bottom: 1.4px solid var(--accent-ink);
+    transform: rotate(40deg);
+  }
+  .rail-item.active {
+    background: var(--accent-soft);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .rail-item.active .mark { border-color: var(--accent); }
+  .rail-item.active .mark::before {
+    content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--accent);
+  }
+  .rail-divider { height: 1px; background: var(--line); margin: 8px 4px; }
+
+  .content { flex: 1; min-width: 0; padding: 20px 24px; overflow: hidden; display: flex; flex-direction: column; }
+  .content-cols { display: flex; gap: 20px; flex: 1; min-height: 0; }
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .col.narrow { flex: 0 0 240px; }
+
+  h2.q {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.28;
+    margin: 0 0 2px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .field-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 8px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-size: 11.5px;
+    padding: 5px 11px;
+    border-radius: 100px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .chip.on { background: var(--accent-soft); border-color: transparent; color: var(--ink); font-weight: 600; }
+  .rule-row { display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); margin: 0; }
+  .rule-row::before { content: ""; width: 3px; height: 3px; border-radius: 50%; background: var(--gold); margin-top: 7px; flex: none; }
+
+  .bubble { padding: 10px 13px; border-radius: 14px; font-size: 12.5px; line-height: 1.45; max-width: 90%; }
+  .bubble.them { background: var(--panel-2); border: 1px solid var(--line); color: var(--ink-soft); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .bubble.me { background: var(--accent-soft); color: var(--ink); border-bottom-right-radius: 4px; align-self: flex-end; }
+
+  .composer {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 10px 10px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 100px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    margin-top: auto;
+  }
+  .composer .send {
+    margin-left: auto; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); flex: none; position: relative;
+  }
+  .composer .send::before {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: 7px; height: 7px; margin: -5px 0 0 -4px;
+    border-top: 1.6px solid var(--accent-ink); border-right: 1.6px solid var(--accent-ink);
+    transform: rotate(45deg);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 9px 18px; border-radius: 9px; border: none;
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--font-body); font-size: 12.5px; font-weight: 600;
+    align-self: flex-start;
+  }
+  .btn.ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); }
+
+  /* task rows */
+  .task-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--panel); font-size: 12.5px;
+  }
+  .task-row .num {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.4px solid var(--line-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: var(--ink-faint);
+    font-family: var(--font-mono); flex: none;
+  }
+  .task-row .status {
+    margin-left: auto; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .status.next { background: var(--accent-soft); color: var(--accent); }
+  .status.queued { background: var(--line); color: var(--ink-faint); }
+  .status.added { background: var(--gold-soft); color: var(--gold); }
+
+  /* viewfinder */
+  .viewfinder {
+    position: relative; border-radius: 10px; overflow: hidden;
+    background: linear-gradient(180deg, #C9D6C3 0%, #C9D6C3 46%, #8C9D82 46%, #8C9D82 100%);
+    flex: 1; min-height: 190px;
+  }
+  .viewfinder .deck { position: absolute; left: 8%; right: 30%; bottom: 0; height: 42%; background: repeating-linear-gradient(90deg, #B7A98C 0 9px, #A99A7C 9px 10px); border-top: 2px solid rgba(0,0,0,0.12); }
+  .viewfinder .fence { position: absolute; right: 4%; top: 30%; bottom: 42%; width: 12%; background: repeating-linear-gradient(90deg, #7C6A4C 0 5px, #6B5B40 5px 6px); opacity: 0.9; }
+  .viewfinder .door { position: absolute; left: 10%; top: 8%; bottom: 42%; width: 16%; background: rgba(255,255,255,0.35); border: 2px solid rgba(255,255,255,0.5); }
+  .viewfinder .cutoff { position: absolute; top: 0; bottom: 0; left: 0; width: 10px; background: repeating-linear-gradient(45deg, var(--warn) 0 4px, transparent 4px 8px); opacity: 0.8; }
+  .viewfinder .dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+  .viewfinder .dots span { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.55); }
+  .viewfinder .dots span.on { background: #fff; width: 14px; border-radius: 3px; }
+
+  .guidance-banner {
+    display: flex; gap: 9px; align-items: flex-start;
+    background: var(--panel-2); border: 1px solid var(--gold-soft);
+    border-radius: 10px; padding: 11px 13px; font-size: 12.5px; line-height: 1.45; color: var(--ink);
+  }
+  .guidance-banner .glyph { width: 15px; height: 15px; border-radius: 50%; border: 1.6px solid var(--gold); flex: none; margin-top: 1px; position: relative; }
+  .guidance-banner .glyph::after { content: ""; position: absolute; left: 50%; top: 3px; bottom: 3px; width: 1.6px; background: var(--gold); transform: translateX(-50%); }
+
+  /* swatches */
+  .swatch-card { display: flex; align-items: center; gap: 11px; padding: 10px; border-radius: 11px; border: 1.6px solid var(--line); }
+  .swatch-card.on { border-color: var(--accent); background: var(--accent-soft); }
+  .swatch { width: 42px; height: 42px; border-radius: 8px; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2); }
+  .swatch.grey { background: linear-gradient(160deg, #C7CCC6, #9EA69A); }
+  .swatch.cedar { background: repeating-linear-gradient(100deg, #B98652 0 4px, #A6743F 4px 8px); }
+  .swatch.hardwood { background: linear-gradient(160deg, #6B4530, #4A2E1E); }
+  .swatch-text { display: flex; flex-direction: column; gap: 1px; }
+  .swatch-text .name { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+  .swatch-text .sub { font-size: 10.5px; color: var(--ink-faint); font-family: var(--font-mono); }
+  .swatch-card .check { margin-left: auto; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); flex: none; position: relative; }
+  .swatch-card .check::after { content: ""; position: absolute; left: 6px; top: 3px; width: 4px; height: 8px; border-right: 1.6px solid var(--accent-ink); border-bottom: 1.6px solid var(--accent-ink); transform: rotate(40deg); }
+
+  /* slider */
+  .slider-readout { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 34px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
+  .slider-track { position: relative; height: 5px; border-radius: 3px; background: var(--line-strong); margin: 18px 2px 9px; }
+  .slider-track .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 30%; border-radius: 3px; background: var(--accent); }
+  .slider-track .handle { position: absolute; top: 50%; left: 30%; width: 18px; height: 18px; border-radius: 50%; background: var(--panel); border: 2.5px solid var(--accent); transform: translate(-50%, -50%); box-shadow: 0 3px 8px rgba(0,0,0,0.4); }
+  .slider-ends { display: flex; justify-content: space-between; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 11.5px; color: var(--ink-faint); }
+
+  /* pitch */
+  .pitch-lede { font-family: var(--font-display); font-size: 15px; line-height: 1.55; color: var(--ink); }
+  .shop-row { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .shop-row:last-child { border-bottom: none; }
+  .shop-row .price { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--gold); font-size: 11.5px; }
+  .render-card {
+    flex: 1; border-radius: 12px; border: 1px dashed var(--line-strong);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: var(--ink-faint); font-size: 11.5px; text-align: center; padding: 20px;
+    background: linear-gradient(160deg, var(--panel), var(--panel-2));
+  }
+  .render-card .ring { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .masthead { padding: 44px 20px 8px; }
+    .reel-wrap { padding: 24px 12px 60px; }
+  }
+</style>
+
+<div class="masthead">
+  <p class="eyebrow">Help Design — web app flow</p>
+  <h1>The same session, as the desktop app the person actually sits in front of.</h1>
+  <p>Eight states of one workspace — a persistent stage rail on the left, the live canvas or question in the center, everything traced through the real deck-refresh session.</p>
+  <div class="session-tag"><span class="dot"></span>Following: <b>“the deck is looking pretty worn out and I want it to feel more inviting”</b></div>
+</div>
+
+<div class="reel-wrap">
+  <div class="reel">
+
+    <!-- 1 — intake -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 1</span><b>Tell the story</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/new</div></div>
+        <div class="app-shell">
+          <div class="app-main" style="flex:1;">
+            <div class="content" style="align-items:center;justify-content:center;">
+              <div style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:16px;">
+                <p class="field-label" style="text-align:center;">New project</p>
+                <div class="bubble them" style="align-self:center;">What are we working on today?</div>
+                <div class="bubble me" style="align-self:center;max-width:100%;">Hey i need to redesign my backyard, the deck is looking pretty worn out and I want it to feel more inviting.</div>
+                <div class="card">
+                  <p class="field-label">We heard</p>
+                  <div class="chip-row">
+                    <span class="chip on">Backyard</span>
+                    <span class="chip on">Refresh the deck</span>
+                    <span class="chip on">Feel more inviting</span>
+                  </div>
+                  <p style="font-size:11.5px;color:var(--ink-faint);margin:10px 0 0;">Still need: budget · material · furniture style</p>
+                </div>
+                <button class="btn" style="align-self:center;">Continue</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 — capture mode choice -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 2</span><b>Show your space</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/capture-mode</div></div>
+        <div class="app-shell">
+          <div class="app-main" style="flex:1;">
+            <div class="content" style="align-items:center;justify-content:center;">
+              <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;">
+                <h2 class="q" style="text-align:center;">How would you like to show us your yard?</h2>
+                <div class="card" style="display:flex;gap:13px;align-items:center;">
+                  <div style="width:38px;height:38px;border-radius:9px;border:1.6px solid var(--line-strong);flex:none;position:relative;">
+                    <div style="position:absolute;inset:9px;border:1.6px solid var(--ink-faint);border-radius:3px;"></div>
+                  </div>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;">Upload a photo</div>
+                    <div style="font-size:11.5px;color:var(--ink-faint);">Share a few pictures</div>
+                  </div>
+                </div>
+                <div class="card" style="display:flex;gap:13px;align-items:center;border-color:var(--accent);background:var(--accent-soft);">
+                  <div style="width:38px;height:38px;border-radius:9px;background:var(--accent);flex:none;position:relative;">
+                    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid var(--accent-ink);"></div>
+                  </div>
+                  <div>
+                    <div style="font-size:13.5px;font-weight:600;">Show me around</div>
+                    <div style="font-size:11.5px;color:var(--ink);">Walk me through it live on video</div>
+                  </div>
+                </div>
+                <button class="btn" style="align-self:center;">Start filming</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 — live capture -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 3</span><b>Guide the shot</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/capture</div></div>
+        <div class="app-shell">
+          <div class="app-main">
+            <div class="rail">
+              <div class="rail-item done"><span class="mark"></span>Tell the story</div>
+              <div class="rail-item done"><span class="mark"></span>Show your space</div>
+              <div class="rail-item active"><span class="mark"></span>Capture the space</div>
+              <div class="rail-item"><span class="mark"></span>Read the space</div>
+              <div class="rail-item"><span class="mark"></span>Plan the work</div>
+            </div>
+            <div class="content">
+              <div class="content-cols">
+                <div class="col">
+                  <p class="field-label">Live · video</p>
+                  <div class="viewfinder">
+                    <div class="door"></div><div class="deck"></div><div class="fence"></div>
+                    <div class="cutoff"></div>
+                    <div class="dots"><span class="on"></span><span></span><span></span></div>
+                  </div>
+                  <div class="guidance-banner"><span class="glyph"></span><span>Pan left about a foot to bring the fence line into frame.</span></div>
+                </div>
+                <div class="col narrow">
+                  <p class="field-label">Coverage so far</p>
+                  <p class="rule-row">Deck boards</p>
+                  <p class="rule-row">Sliding door</p>
+                  <p class="rule-row">Part of the lawn</p>
+                  <div class="card" style="margin-top:auto;">
+                    <p style="font-size:11px;color:var(--ink-faint);margin:0;">Frame 1 of 3 · waiting on the fence line and the deck-to-grass edge</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 — read the space -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 4</span><b>Read the space</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/scene</div></div>
+        <div class="app-shell">
+          <div class="app-main">
+            <div class="rail">
+              <div class="rail-item done"><span class="mark"></span>Tell the story</div>
+              <div class="rail-item done"><span class="mark"></span>Show your space</div>
+              <div class="rail-item done"><span class="mark"></span>Capture the space</div>
+              <div class="rail-item active"><span class="mark"></span>Read the space</div>
+              <div class="rail-item"><span class="mark"></span>Plan the work</div>
+            </div>
+            <div class="content">
+              <div class="content-cols">
+                <div class="col">
+                  <div class="card">
+                    <p class="field-label">Style</p>
+                    <div class="chip-row"><span class="chip">Traditional</span><span class="chip">Worn wood</span></div>
+                  </div>
+                  <div>
+                    <p class="field-label">What we noticed</p>
+                    <p class="rule-row">Existing wood deck and wood fence</p>
+                    <p class="rule-row">Lawn area with sliding door access</p>
+                  </div>
+                </div>
+                <div class="col">
+                  <div>
+                    <p class="field-label">Where to focus</p>
+                    <p class="rule-row">Replace the decking material</p>
+                    <p class="rule-row">Add a defined seating area</p>
+                    <p class="rule-row">Improve evening lighting</p>
+                  </div>
+                  <button class="btn" style="margin-top:auto;">Plan the work →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 — plan the work -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 5</span><b>Plan the work</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/tasks</div></div>
+        <div class="app-shell">
+          <div class="app-main">
+            <div class="rail">
+              <div class="rail-item done"><span class="mark"></span>Tell the story</div>
+              <div class="rail-item done"><span class="mark"></span>Show your space</div>
+              <div class="rail-item done"><span class="mark"></span>Capture the space</div>
+              <div class="rail-item done"><span class="mark"></span>Read the space</div>
+              <div class="rail-item active"><span class="mark"></span>Plan the work</div>
+            </div>
+            <div class="content">
+              <div class="content-cols">
+                <div class="col">
+                  <p class="field-label">Decision areas</p>
+                  <div class="task-row"><span class="num">1</span>Decking materials<span class="status next">Up next</span></div>
+                  <div class="task-row"><span class="num">2</span>Budget<span class="status queued">Queued</span></div>
+                  <div class="task-row"><span class="num">3</span>Furniture<span class="status queued">Queued</span></div>
+                  <div class="task-row"><span class="num">4</span>Lighting<span class="status added">Added</span></div>
+                </div>
+                <div class="col narrow">
+                  <p class="field-label">Edit the plan</p>
+                  <div class="bubble me" style="align-self:flex-end;">Can you also add something about outdoor lighting?</div>
+                  <div class="bubble them">Added — Lighting is now on the list.</div>
+                  <div class="composer">Add or change a task…<span class="send"></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 — task: materials -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 6</span><b>Make the call — materials</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/tasks/materials</div></div>
+        <div class="app-shell">
+          <div class="app-main">
+            <div class="rail">
+              <div class="rail-item done"><span class="mark"></span>Read the space</div>
+              <div class="rail-divider"></div>
+              <div class="rail-item active"><span class="mark"></span>Decking materials</div>
+              <div class="rail-item"><span class="mark"></span>Budget</div>
+              <div class="rail-item"><span class="mark"></span>Furniture</div>
+              <div class="rail-item"><span class="mark"></span>Lighting</div>
+            </div>
+            <div class="content">
+              <div class="content-cols">
+                <div class="col">
+                  <h2 class="q">What type of decking material are you drawn to?</h2>
+                  <p style="font-size:11.5px;color:var(--ink-faint);margin:0 0 4px;">Grounded against the decking catalog</p>
+                  <div class="swatch-card on"><span class="swatch grey"></span><span class="swatch-text"><span class="name">Composite Grey</span><span class="sub">$8.50 / board ft</span></span><span class="check"></span></div>
+                  <div class="swatch-card"><span class="swatch cedar"></span><span class="swatch-text"><span class="name">Natural Cedar</span><span class="sub">$6.75 / board ft</span></span></div>
+                  <div class="swatch-card"><span class="swatch hardwood"></span><span class="swatch-text"><span class="name">Tropical Hardwood</span><span class="sub">$11.25 / board ft</span></span></div>
+                </div>
+                <div class="col narrow">
+                  <p class="field-label">Task 1 of 4</p>
+                  <div class="bubble them">Composite holds up well against a wood fence like yours, and it won't need refinishing.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 — task: budget -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 6</span><b>Make the call — budget</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/tasks/budget</div></div>
+        <div class="app-shell">
+          <div class="app-main">
+            <div class="rail">
+              <div class="rail-item done"><span class="mark"></span>Decking materials</div>
+              <div class="rail-item active"><span class="mark"></span>Budget</div>
+              <div class="rail-item"><span class="mark"></span>Furniture</div>
+              <div class="rail-item"><span class="mark"></span>Lighting</div>
+            </div>
+            <div class="content" style="align-items:center;justify-content:center;">
+              <div style="width:100%;max-width:380px;">
+                <h2 class="q" style="text-align:center;">What's your budget range for this deck project?</h2>
+                <div class="card" style="text-align:center;padding:24px 18px;margin-top:16px;">
+                  <div class="slider-readout">$6,000</div>
+                  <div class="slider-track"><div class="fill"></div><div class="handle"></div></div>
+                  <div class="slider-ends"><span>$2,000</span><span>$15,000</span></div>
+                </div>
+                <p style="font-size:12px;color:var(--ink-faint);text-align:center;margin:12px 0 0;">Most similar decks land around $6,000.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 — the pitch -->
+    <div class="stage">
+      <p class="stage-label"><span class="tag">Stage 7</span><b>See the pitch</b></p>
+      <div class="window">
+        <div class="chrome"><div class="dots"><span></span><span></span><span></span></div><div class="addr">helpdesign.app/session/backyard-deck/proposal</div></div>
+        <div class="app-shell">
+          <div class="app-main" style="flex:1;">
+            <div class="content">
+              <div class="content-cols">
+                <div class="col">
+                  <p class="pitch-lede">A refreshed, low-maintenance deck built around composite grey boards, anchored by a woven lounge seating area near the sliding door so the space reads as an intentional outdoor living room.</p>
+                  <div>
+                    <p class="field-label">Shopping list</p>
+                    <div class="shop-row"><span>Composite Grey Deck Boards</span><span class="price">$8.50/ft</span></div>
+                    <div class="shop-row"><span>Woven Lounge Chair Set</span><span class="price">$620</span></div>
+                  </div>
+                  <div>
+                    <p class="field-label">Next steps</p>
+                    <p class="rule-row">Confirm deck measurements before ordering</p>
+                    <p class="rule-row">Get an installer quote for boards</p>
+                  </div>
+                </div>
+                <div class="col narrow">
+                  <p class="field-label">Immersive preview</p>
+                  <div class="render-card">
+                    <div class="ring"></div>
+                    Rendering 3D angles from your scene + picks
+                  </div>
+                  <button class="btn">View in 3D →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
